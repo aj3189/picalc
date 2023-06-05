@@ -1,0 +1,561 @@
+   0  $accept : %entry% $end
+
+   1  toplevel : EOF
+   2           | Command SEMI toplevel
+
+   3  Command : IMPORT STRINGV
+   4          | Term
+   5          | LCID Binder
+
+   6  Binder : SLASH
+
+   7  Term : PiTerm
+   8       | LambdaTerm
+
+   9  PiTerm : END
+  10         | LPAREN PiTerm VBAR PiTerm RPAREN
+  11         | LPAREN ON LCID SEND LCID RPAREN DOT PiTerm
+  12         | LPAREN ON LCID RECV LCID RPAREN DOT PiTerm
+  13         | LPAREN NEW LCID RPAREN DOT PiTerm
+  14         | BANG LPAREN ON LCID RECV LCID RPAREN DOT PiTerm
+
+  15  LambdaTerm : AppTerm
+  16             | LAMBDA LCID DOT LambdaTerm
+  17             | LAMBDA USCORE DOT LambdaTerm
+
+  18  AppTerm : ATerm
+  19          | AppTerm ATerm
+
+  20  ATerm : LPAREN LambdaTerm RPAREN
+  21        | LCID
+
+  22  %entry% : '\001' toplevel
+
+state 0
+	$accept : . %entry% $end  (0)
+
+	'\001'  shift 1
+	.  error
+
+	%entry%  goto 2
+
+
+state 1
+	%entry% : '\001' . toplevel  (22)
+
+	IMPORT  shift 3
+	LAMBDA  shift 4
+	END  shift 5
+	LCID  shift 6
+	BANG  shift 7
+	EOF  shift 8
+	LPAREN  shift 9
+	.  error
+
+	toplevel  goto 10
+	Command  goto 11
+	Term  goto 12
+	PiTerm  goto 13
+	LambdaTerm  goto 14
+	AppTerm  goto 15
+	ATerm  goto 16
+
+
+state 2
+	$accept : %entry% . $end  (0)
+
+	$end  accept
+
+
+state 3
+	Command : IMPORT . STRINGV  (3)
+
+	STRINGV  shift 17
+	.  error
+
+
+state 4
+	LambdaTerm : LAMBDA . LCID DOT LambdaTerm  (16)
+	LambdaTerm : LAMBDA . USCORE DOT LambdaTerm  (17)
+
+	LCID  shift 18
+	USCORE  shift 19
+	.  error
+
+
+state 5
+	PiTerm : END .  (9)
+
+	.  reduce 9
+
+
+state 6
+	Command : LCID . Binder  (5)
+	ATerm : LCID .  (21)
+
+	SLASH  shift 20
+	LCID  reduce 21
+	LPAREN  reduce 21
+	SEMI  reduce 21
+
+	Binder  goto 21
+
+
+state 7
+	PiTerm : BANG . LPAREN ON LCID RECV LCID RPAREN DOT PiTerm  (14)
+
+	LPAREN  shift 22
+	.  error
+
+
+state 8
+	toplevel : EOF .  (1)
+
+	.  reduce 1
+
+
+state 9
+	PiTerm : LPAREN . PiTerm VBAR PiTerm RPAREN  (10)
+	PiTerm : LPAREN . ON LCID SEND LCID RPAREN DOT PiTerm  (11)
+	PiTerm : LPAREN . ON LCID RECV LCID RPAREN DOT PiTerm  (12)
+	PiTerm : LPAREN . NEW LCID RPAREN DOT PiTerm  (13)
+	ATerm : LPAREN . LambdaTerm RPAREN  (20)
+
+	LAMBDA  shift 4
+	NEW  shift 23
+	END  shift 5
+	ON  shift 24
+	LCID  shift 25
+	BANG  shift 7
+	LPAREN  shift 9
+	.  error
+
+	PiTerm  goto 26
+	LambdaTerm  goto 27
+	AppTerm  goto 15
+	ATerm  goto 16
+
+
+state 10
+	%entry% : '\001' toplevel .  (22)
+
+	.  reduce 22
+
+
+state 11
+	toplevel : Command . SEMI toplevel  (2)
+
+	SEMI  shift 28
+	.  error
+
+
+state 12
+	Command : Term .  (4)
+
+	.  reduce 4
+
+
+state 13
+	Term : PiTerm .  (7)
+
+	.  reduce 7
+
+
+state 14
+	Term : LambdaTerm .  (8)
+
+	.  reduce 8
+
+
+state 15
+	LambdaTerm : AppTerm .  (15)
+	AppTerm : AppTerm . ATerm  (19)
+
+	LCID  shift 25
+	LPAREN  shift 29
+	RPAREN  reduce 15
+	SEMI  reduce 15
+
+	ATerm  goto 30
+
+
+state 16
+	AppTerm : ATerm .  (18)
+
+	.  reduce 18
+
+
+state 17
+	Command : IMPORT STRINGV .  (3)
+
+	.  reduce 3
+
+
+state 18
+	LambdaTerm : LAMBDA LCID . DOT LambdaTerm  (16)
+
+	DOT  shift 31
+	.  error
+
+
+state 19
+	LambdaTerm : LAMBDA USCORE . DOT LambdaTerm  (17)
+
+	DOT  shift 32
+	.  error
+
+
+state 20
+	Binder : SLASH .  (6)
+
+	.  reduce 6
+
+
+state 21
+	Command : LCID Binder .  (5)
+
+	.  reduce 5
+
+
+state 22
+	PiTerm : BANG LPAREN . ON LCID RECV LCID RPAREN DOT PiTerm  (14)
+
+	ON  shift 33
+	.  error
+
+
+state 23
+	PiTerm : LPAREN NEW . LCID RPAREN DOT PiTerm  (13)
+
+	LCID  shift 34
+	.  error
+
+
+state 24
+	PiTerm : LPAREN ON . LCID SEND LCID RPAREN DOT PiTerm  (11)
+	PiTerm : LPAREN ON . LCID RECV LCID RPAREN DOT PiTerm  (12)
+
+	LCID  shift 35
+	.  error
+
+
+state 25
+	ATerm : LCID .  (21)
+
+	.  reduce 21
+
+
+state 26
+	PiTerm : LPAREN PiTerm . VBAR PiTerm RPAREN  (10)
+
+	VBAR  shift 36
+	.  error
+
+
+state 27
+	ATerm : LPAREN LambdaTerm . RPAREN  (20)
+
+	RPAREN  shift 37
+	.  error
+
+
+state 28
+	toplevel : Command SEMI . toplevel  (2)
+
+	IMPORT  shift 3
+	LAMBDA  shift 4
+	END  shift 5
+	LCID  shift 6
+	BANG  shift 7
+	EOF  shift 8
+	LPAREN  shift 9
+	.  error
+
+	toplevel  goto 38
+	Command  goto 11
+	Term  goto 12
+	PiTerm  goto 13
+	LambdaTerm  goto 14
+	AppTerm  goto 15
+	ATerm  goto 16
+
+
+state 29
+	ATerm : LPAREN . LambdaTerm RPAREN  (20)
+
+	LAMBDA  shift 4
+	LCID  shift 25
+	LPAREN  shift 29
+	.  error
+
+	LambdaTerm  goto 27
+	AppTerm  goto 15
+	ATerm  goto 16
+
+
+state 30
+	AppTerm : AppTerm ATerm .  (19)
+
+	.  reduce 19
+
+
+state 31
+	LambdaTerm : LAMBDA LCID DOT . LambdaTerm  (16)
+
+	LAMBDA  shift 4
+	LCID  shift 25
+	LPAREN  shift 29
+	.  error
+
+	LambdaTerm  goto 39
+	AppTerm  goto 15
+	ATerm  goto 16
+
+
+state 32
+	LambdaTerm : LAMBDA USCORE DOT . LambdaTerm  (17)
+
+	LAMBDA  shift 4
+	LCID  shift 25
+	LPAREN  shift 29
+	.  error
+
+	LambdaTerm  goto 40
+	AppTerm  goto 15
+	ATerm  goto 16
+
+
+state 33
+	PiTerm : BANG LPAREN ON . LCID RECV LCID RPAREN DOT PiTerm  (14)
+
+	LCID  shift 41
+	.  error
+
+
+state 34
+	PiTerm : LPAREN NEW LCID . RPAREN DOT PiTerm  (13)
+
+	RPAREN  shift 42
+	.  error
+
+
+state 35
+	PiTerm : LPAREN ON LCID . SEND LCID RPAREN DOT PiTerm  (11)
+	PiTerm : LPAREN ON LCID . RECV LCID RPAREN DOT PiTerm  (12)
+
+	SEND  shift 43
+	RECV  shift 44
+	.  error
+
+
+state 36
+	PiTerm : LPAREN PiTerm VBAR . PiTerm RPAREN  (10)
+
+	END  shift 5
+	BANG  shift 7
+	LPAREN  shift 45
+	.  error
+
+	PiTerm  goto 46
+
+
+state 37
+	ATerm : LPAREN LambdaTerm RPAREN .  (20)
+
+	.  reduce 20
+
+
+state 38
+	toplevel : Command SEMI toplevel .  (2)
+
+	.  reduce 2
+
+
+state 39
+	LambdaTerm : LAMBDA LCID DOT LambdaTerm .  (16)
+
+	.  reduce 16
+
+
+state 40
+	LambdaTerm : LAMBDA USCORE DOT LambdaTerm .  (17)
+
+	.  reduce 17
+
+
+state 41
+	PiTerm : BANG LPAREN ON LCID . RECV LCID RPAREN DOT PiTerm  (14)
+
+	RECV  shift 47
+	.  error
+
+
+state 42
+	PiTerm : LPAREN NEW LCID RPAREN . DOT PiTerm  (13)
+
+	DOT  shift 48
+	.  error
+
+
+state 43
+	PiTerm : LPAREN ON LCID SEND . LCID RPAREN DOT PiTerm  (11)
+
+	LCID  shift 49
+	.  error
+
+
+state 44
+	PiTerm : LPAREN ON LCID RECV . LCID RPAREN DOT PiTerm  (12)
+
+	LCID  shift 50
+	.  error
+
+
+state 45
+	PiTerm : LPAREN . PiTerm VBAR PiTerm RPAREN  (10)
+	PiTerm : LPAREN . ON LCID SEND LCID RPAREN DOT PiTerm  (11)
+	PiTerm : LPAREN . ON LCID RECV LCID RPAREN DOT PiTerm  (12)
+	PiTerm : LPAREN . NEW LCID RPAREN DOT PiTerm  (13)
+
+	NEW  shift 23
+	END  shift 5
+	ON  shift 24
+	BANG  shift 7
+	LPAREN  shift 45
+	.  error
+
+	PiTerm  goto 26
+
+
+state 46
+	PiTerm : LPAREN PiTerm VBAR PiTerm . RPAREN  (10)
+
+	RPAREN  shift 51
+	.  error
+
+
+state 47
+	PiTerm : BANG LPAREN ON LCID RECV . LCID RPAREN DOT PiTerm  (14)
+
+	LCID  shift 52
+	.  error
+
+
+state 48
+	PiTerm : LPAREN NEW LCID RPAREN DOT . PiTerm  (13)
+
+	END  shift 5
+	BANG  shift 7
+	LPAREN  shift 45
+	.  error
+
+	PiTerm  goto 53
+
+
+state 49
+	PiTerm : LPAREN ON LCID SEND LCID . RPAREN DOT PiTerm  (11)
+
+	RPAREN  shift 54
+	.  error
+
+
+state 50
+	PiTerm : LPAREN ON LCID RECV LCID . RPAREN DOT PiTerm  (12)
+
+	RPAREN  shift 55
+	.  error
+
+
+state 51
+	PiTerm : LPAREN PiTerm VBAR PiTerm RPAREN .  (10)
+
+	.  reduce 10
+
+
+state 52
+	PiTerm : BANG LPAREN ON LCID RECV LCID . RPAREN DOT PiTerm  (14)
+
+	RPAREN  shift 56
+	.  error
+
+
+state 53
+	PiTerm : LPAREN NEW LCID RPAREN DOT PiTerm .  (13)
+
+	.  reduce 13
+
+
+state 54
+	PiTerm : LPAREN ON LCID SEND LCID RPAREN . DOT PiTerm  (11)
+
+	DOT  shift 57
+	.  error
+
+
+state 55
+	PiTerm : LPAREN ON LCID RECV LCID RPAREN . DOT PiTerm  (12)
+
+	DOT  shift 58
+	.  error
+
+
+state 56
+	PiTerm : BANG LPAREN ON LCID RECV LCID RPAREN . DOT PiTerm  (14)
+
+	DOT  shift 59
+	.  error
+
+
+state 57
+	PiTerm : LPAREN ON LCID SEND LCID RPAREN DOT . PiTerm  (11)
+
+	END  shift 5
+	BANG  shift 7
+	LPAREN  shift 45
+	.  error
+
+	PiTerm  goto 60
+
+
+state 58
+	PiTerm : LPAREN ON LCID RECV LCID RPAREN DOT . PiTerm  (12)
+
+	END  shift 5
+	BANG  shift 7
+	LPAREN  shift 45
+	.  error
+
+	PiTerm  goto 61
+
+
+state 59
+	PiTerm : BANG LPAREN ON LCID RECV LCID RPAREN DOT . PiTerm  (14)
+
+	END  shift 5
+	BANG  shift 7
+	LPAREN  shift 45
+	.  error
+
+	PiTerm  goto 62
+
+
+state 60
+	PiTerm : LPAREN ON LCID SEND LCID RPAREN DOT PiTerm .  (11)
+
+	.  reduce 11
+
+
+state 61
+	PiTerm : LPAREN ON LCID RECV LCID RPAREN DOT PiTerm .  (12)
+
+	.  reduce 12
+
+
+state 62
+	PiTerm : BANG LPAREN ON LCID RECV LCID RPAREN DOT PiTerm .  (14)
+
+	.  reduce 14
+
+
+52 terminals, 10 nonterminals
+23 grammar rules, 63 states
