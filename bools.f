@@ -1,1 +1,3 @@
-((lambda a. lambda b. a) t) f;
+(lambda x.x) y;
+
+y;

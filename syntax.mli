@@ -32,6 +32,7 @@ type context
 val emptycontext : context 
 val ctxlength : context -> int
 val setlinear : context -> bool -> context
+val islinear : context -> bool
 val addbinding : context -> string -> binding -> context
 val addname: context -> string -> context
 val index2name : info -> context -> int -> string

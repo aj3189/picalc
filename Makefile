@@ -29,7 +29,7 @@ all: $(DEPEND) $(OBJS) f
 windows: $(DEPEND) $(OBJS) f.exe
 
 # Include an automatically generated list of dependencies between source files
-include .depend
+-include .depend
 
 # Build an executable typechecker
 f: $(OBJS) main.cmo 

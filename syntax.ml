@@ -46,6 +46,7 @@ let addbinding ctx x bind = {ctx with bound = (x,bind)::ctx.bound}
 let addname ctx x = addbinding ctx x NameBind
 
 let setlinear ctx b = {ctx with linear = b}
+let islinear ctx = ctx.linear
 let isnamebound ctx x =
   let rec isnameboundhelp b x = 
     match b with
